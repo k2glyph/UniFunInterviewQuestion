@@ -1,0 +1,37 @@
+
+input:-moz-placeholder {
+    box-shadow:none !important;
+}
+
+input:invalid {
+    box-shadow:none;
+}
+
+.changeCursor{
+    background-color:red;
+}
+
+pre {
+    display: block;
+    font-family: monospace;
+    white-space: pre;
+    font-size: 12px;
+    margin:0;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+}
+.alert-info {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    width: 77%;
+}

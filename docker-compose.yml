@@ -1,0 +1,52 @@
+version: '3.4'
+
+networks:
+  smssender: 
+    ipam:
+      config:
+        - subnet: 10.0.10.0/24
+services:
+  kannel:
+    image: bulktrade/kannel:r5159
+    networks:
+      - smssender
+    ports:
+      - "13013" # smsbox
+      - "13000" # kannel admin
+    volumes:
+      - "./kannel.conf:/etc/kannel/kannel.conf"
+    # #  - "./opensmppbox.conf:/etc/kannel/opensmppbox.conf"
+  db:
+    image: mysql:5.7
+    networks:
+      - smssender
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: smssender
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    # volumes:
+      # - mysql_data:/var/lib/mysql
+  #     #   - mysql_data:/var/lib/mysql:rw
+  backend:
+    image: backend-v1
+    ports:
+      - 8080:8080
+    networks:
+      - smssender
+    depends_on:
+      - db
+      - kannel
+  frontend:
+        image: frontend-v1
+        ports:
+          - 9000:8050
+        networks:
+          - smssender
+        depends_on:
+          - backend
+
