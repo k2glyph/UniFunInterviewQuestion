@@ -1,0 +1,62 @@
+version: '3.4'
+
+networks:
+  smssender: 
+    ipam:
+      config:
+        - subnet: 10.0.10.0/24
+services:
+  bearerbox:
+    image: nguyendinhtrung141/kannel-1.4.4
+    hostname: bearerbox
+    networks:
+      - smssender
+    command: bearerbox /etc/kannel/kannel.conf
+    volumes:
+      - ./kannel-conf:/etc/kannel
+      - ./log:/var/log/kannel
+  smsbox:
+    image: nguyendinhtrung141/kannel-1.4.4
+    hostname: smsbox
+    command: smsbox /etc/kannel/smsbox.conf
+    networks:
+      - smssender
+    links:
+      - bearerbox
+    volumes:
+      - ./kannel-conf:/etc/kannel
+      - ./log:/var/log/kannel
+  db:
+    image: mysql:5.7
+    networks:
+      - smssender
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: smssender
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    # volumes:
+      # - mysql_data:/var/lib/mysql
+  #     #   - mysql_data:/var/lib/mysql:rw
+  backend:
+    image: backend-v1
+    ports:
+      - 8080:8080
+    networks:
+      - smssender
+    links:
+      - db
+      - smsbox
+  frontend:
+    image: frontend-v1
+    ports:
+      - 9000:8050
+    networks:
+      - smssender
+    depends_on:
+      - backend
+
